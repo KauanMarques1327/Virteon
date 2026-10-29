@@ -1,0 +1,178 @@
+/* Keep all supplied artwork visible on portrait and ultrawide screens. */
+.startup-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #030404;
+  opacity: 1;
+}
+html:has(.startup-screen),
+body:has(.startup-screen) {
+  overflow: hidden;
+}
+.startup-content {
+  flex: 1;
+  min-width: 0;
+}
+.startup-content[data-startup-state="loading"] {
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  visibility: hidden;
+}
+.startup-artwork {
+  position: relative;
+  width: min(100vw, 150vh);
+  width: min(100vw, 150dvh);
+  aspect-ratio: 3 / 2;
+  animation: startup-in 240ms ease-out both;
+}
+.startup-artwork > img {
+  opacity: 0;
+  transition: opacity 240ms ease-out;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.startup-artwork > img[data-ready="true"] {
+  opacity: 1;
+}
+/* Mask the embedded bar and glow without covering the logo or tagline.
+   Coordinates are relative to the supplied 1536 × 1024 artwork. */
+.startup-bar-mask {
+  position: absolute;
+  left: 16%;
+  right: 16%;
+  top: 87%;
+  height: 9.5%;
+  background: #030404;
+  box-shadow: 0 0 14px 10px #030404;
+  border-radius: 20px;
+}
+.startup-progress {
+  position: absolute;
+  left: 19.1%;
+  width: 61.8%;
+  top: 89.75%;
+  height: 3.125%;
+  border: clamp(1px, 0.15vw, 2px) solid #a8770c;
+  border-radius: 999px;
+  background: #10100d;
+  box-shadow:
+    0 0 12px #ffbc0026,
+    inset 0 0 4px #000;
+}
+.startup-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background:
+    repeating-linear-gradient(135deg, #fff1 0 15px, transparent 15px 30px),
+    linear-gradient(90deg, #ffc400, #ff9b00 50%, #ffe600);
+  box-shadow:
+    0 0 12px #ffc40099,
+    inset 0 0 3px #fff57b;
+}
+.startup-progress-fill[style="width: 0%;"] {
+  box-shadow: none;
+}
+.startup-screen[data-phase="leaving"] {
+  animation: startup-out 250ms ease-in both;
+  pointer-events: none;
+}
+.startup-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: #030404;
+  color: #ffca00;
+  font-size: clamp(32px, 8vw, 100px);
+  font-weight: 700;
+}
+.startup-fallback span {
+  color: #fff;
+  font-size: clamp(10px, 1.4vw, 20px);
+  text-align: center;
+}
+/* Only the shared Brand changes; the platform palette is preserved. */
+.brand {
+  display: block;
+  width: 124px;
+  flex-shrink: 0;
+  line-height: 0;
+  background: transparent;
+}
+.brand-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1536 / 796;
+  object-fit: contain;
+  /* Use the artwork's luminance as alpha to suppress its dark rectangular
+     backdrop, then blend remaining shadows into the header/sidebar. */
+  mix-blend-mode: screen;
+  mask-image: url("/virteon-logo.jpg");
+  mask-mode: luminance;
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+}
+.sidebar .brand {
+  width: min(170px, 100%);
+}
+.brand-fallback {
+  display: block;
+  padding: 18px 8px;
+  color: #ffca00;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 1px;
+}
+.landing-footer .brand {
+  width: 110px;
+}
+@media (max-width: 900px) {
+  .sidebar .brand {
+    width: 128px;
+  }
+}
+@media (max-width: 700px) {
+  .landing-header .brand {
+    width: 104px;
+  }
+  .sidebar .brand {
+    width: 125px;
+  }
+}
+@keyframes startup-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes startup-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .startup-artwork,
+  .startup-screen[data-phase="leaving"] {
+    animation: none;
+  }
+}
